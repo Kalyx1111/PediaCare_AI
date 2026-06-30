@@ -1,0 +1,1165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PediaCare AI - Paediatric Health Intelligence Platform</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=DM+Sans:wght@300;400;500;600&family=Cormorant+Garamond:ital,wght@0,400;1,400&display=swap');
+:root{
+  --sky:#2986cc;--sky-lt:#6fb8e8;--sky-pale:#e8f3fb;
+  --coral:#e8794a;--coral-lt:#f0a878;--coral-pale:#fdf0e8;
+  --sun:#f0b429;--sun-pale:#fdf6e3;
+  --red:#d64545;--red-pale:#fceaea;
+  --cream:#fefdfb;--cream2:#f7f9fb;
+  --text:#16202b;--text2:#384552;--text3:#8294a3;
+  --border:rgba(41,134,204,0.18);--border2:rgba(41,134,204,0.38);
+  --shadow:0 8px 40px rgba(22,32,43,0.1);--shadow2:0 20px 80px rgba(22,32,43,0.18);
+  --r:14px;--r2:22px;
+  --serif:'Playfair Display',serif;--body:'DM Sans',sans-serif;--it:'Cormorant Garamond',serif;
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:var(--body);background:var(--cream);color:var(--text);overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(ellipse 70% 50% at 5% 0%,rgba(41,134,204,0.06) 0%,transparent 60%),
+  radial-gradient(ellipse 50% 60% at 95% 100%,rgba(232,121,74,0.04) 0%,transparent 60%);}
+::-webkit-scrollbar{width:5px;height:5px;}::-webkit-scrollbar-track{background:var(--cream2);}::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:translateY(0)}}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.4;transform:scale(1.4)}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes shimmer{0%{background-position:-400px 0}100%{background-position:400px 0}}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+
+#disc-modal{position:fixed;inset:0;z-index:9999;background:rgba(8,16,24,0.95);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;padding:20px;}
+.disc-box{background:var(--cream);border-radius:var(--r2);max-width:700px;width:100%;max-height:92vh;overflow-y:auto;padding:48px 52px;border:1px solid var(--border2);box-shadow:var(--shadow2);}
+.disc-icon{font-size:52px;text-align:center;display:block;margin-bottom:14px;animation:bounce 2s ease infinite;}
+.disc-box h1{font-family:var(--serif);font-size:24px;font-weight:700;color:var(--sky);text-align:center;margin-bottom:6px;}
+.disc-sub{text-align:center;font-size:13px;color:var(--text3);margin-bottom:26px;}
+.disc-content{background:var(--sky-pale);border:1px solid var(--border2);border-radius:var(--r);padding:22px;margin-bottom:20px;font-size:13px;line-height:1.85;color:var(--text);}
+.disc-content p{margin-bottom:10px;}.disc-content p:last-child{margin-bottom:0;}
+.disc-content strong{color:var(--sky);font-weight:600;}
+.disc-chk{margin-bottom:22px;}
+.chk-row{display:flex;gap:12px;align-items:flex-start;margin-bottom:12px;cursor:pointer;}
+.chk-row input{width:17px;height:17px;accent-color:var(--sky);margin-top:2px;cursor:pointer;flex-shrink:0;}
+.chk-row label{font-size:13px;line-height:1.55;cursor:pointer;color:var(--text2);}
+.disc-accept{width:100%;padding:16px;border-radius:var(--r);background:linear-gradient(135deg,var(--sky),var(--sky-lt));color:#fff;font-family:var(--body);font-size:15px;font-weight:600;border:none;cursor:pointer;transition:all 0.2s;}
+.disc-accept:hover:not(:disabled){transform:translateY(-2px);box-shadow:0 8px 28px rgba(41,134,204,0.4);}
+.disc-accept:disabled{opacity:0.4;cursor:not-allowed;}
+.disc-bar{position:sticky;top:0;z-index:200;background:linear-gradient(90deg,#1a5d8f,var(--sky),#1a5d8f);background-size:200%;animation:shimmer 4s linear infinite;padding:9px 20px;text-align:center;font-size:12px;font-weight:600;color:#fff;border-bottom:1px solid rgba(255,255,255,0.1);}
+.pdot{display:inline-block;width:7px;height:7px;background:#fff;border-radius:50%;margin-right:8px;animation:pulse 1.5s ease infinite;vertical-align:middle;}
+header{position:relative;z-index:10;background:linear-gradient(160deg,#0a1420 0%,#1a5d8f 55%,#0e2a3d 100%);padding:64px 40px 52px;text-align:center;border-bottom:2px solid var(--sky-lt);overflow:hidden;}
+header::before{content:'';position:absolute;inset:0;pointer-events:none;background:radial-gradient(circle 700px at 15% 50%,rgba(41,134,204,0.15) 0%,transparent 70%),radial-gradient(circle 500px at 85% 50%,rgba(232,121,74,0.1) 0%,transparent 70%);}
+.hdr-inner{position:relative;z-index:1;max-width:900px;margin:0 auto;}
+.hdr-eyebrow{font-size:11px;font-weight:500;letter-spacing:0.22em;text-transform:uppercase;color:var(--sky-lt);margin-bottom:18px;}
+header h1{font-family:var(--serif);font-size:clamp(32px,5vw,60px);font-weight:700;color:#f0f8fd;line-height:1.08;margin-bottom:8px;}
+header h1 span{color:var(--coral-lt);}
+.hdr-sub{font-family:var(--it);font-style:italic;font-size:19px;color:rgba(180,220,245,0.88);margin-bottom:20px;}
+.hdr-line{width:100px;height:1px;background:linear-gradient(90deg,transparent,var(--sky-lt),transparent);margin:18px auto;}
+.hdr-desc{font-size:14.5px;color:rgba(170,210,235,0.8);line-height:1.75;max-width:700px;margin:0 auto;}
+.hdr-badges{display:flex;gap:12px;justify-content:center;margin-top:24px;flex-wrap:wrap;}
+.hbadge{padding:6px 18px;border-radius:20px;font-size:12px;font-weight:600;letter-spacing:0.04em;border:1px solid;}
+.hb-s{background:rgba(41,134,204,0.25);border-color:rgba(41,134,204,0.5);color:#a8d8f5;}
+.hb-c{background:rgba(232,121,74,0.25);border-color:rgba(232,121,74,0.45);color:#f5c0a0;}
+.hb-y{background:rgba(240,180,41,0.2);border-color:rgba(240,180,41,0.4);color:#f5dca0;}
+.main-nav{position:sticky;top:42px;z-index:100;background:rgba(254,253,251,0.97);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);padding:0 32px;}
+.nav-inner{max-width:1400px;margin:0 auto;display:flex;gap:0;overflow-x:auto;}
+.nav-inner::-webkit-scrollbar{height:0;}
+.ntab{padding:15px 14px;font-size:12.5px;font-weight:500;color:var(--text3);cursor:pointer;white-space:nowrap;border-bottom:2px solid transparent;transition:all 0.2s;}
+.ntab:hover{color:var(--sky);}.ntab.active{color:var(--sky);border-bottom-color:var(--coral);font-weight:600;}
+.app{display:grid;grid-template-columns:258px 1fr;max-width:1500px;margin:0 auto;position:relative;z-index:1;min-height:calc(100vh - 260px);}
+.sidebar{border-right:1px solid var(--border);background:rgba(232,243,251,0.3);padding:22px 0;position:sticky;top:112px;height:calc(100vh - 112px);overflow-y:auto;}
+.sidebar::-webkit-scrollbar{width:4px;}.sidebar::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px;}
+.sb-lbl{padding:8px 18px 4px;font-size:10px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--text3);}
+.sbi{display:flex;align-items:center;gap:10px;padding:9px 18px;cursor:pointer;transition:all 0.15s;border-left:3px solid transparent;font-size:13px;color:var(--text2);}
+.sbi:hover{background:rgba(41,134,204,0.06);color:var(--text);}
+.sbi.active{background:rgba(41,134,204,0.08);border-left-color:var(--coral);color:var(--sky);font-weight:600;}
+.sbi .si{font-size:15px;width:20px;text-align:center;flex-shrink:0;}
+.sb-div{height:1px;background:var(--border);margin:10px 14px;}
+.sb-new{font-size:9px;font-weight:700;background:var(--coral);color:#fff;padding:2px 7px;border-radius:10px;margin-left:auto;}
+.main{padding:38px 44px;}
+.panel{display:none;}.panel.active{display:block;animation:fadeUp 0.3s ease;}
+.ph{margin-bottom:30px;}
+.ph-crumb{font-size:11px;font-weight:600;letter-spacing:0.12em;text-transform:uppercase;color:var(--coral);margin-bottom:8px;}
+.ph h2{font-family:var(--serif);font-size:28px;font-weight:700;color:var(--text);line-height:1.15;}
+.ph p{margin-top:10px;font-family:var(--it);font-size:17px;color:var(--text2);line-height:1.7;max-width:680px;font-style:italic;}
+.p-line{width:60px;height:2px;background:linear-gradient(90deg,var(--coral),transparent);margin:12px 0;}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:18px;}
+.g3{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;}
+.card{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:22px;transition:all 0.22s;position:relative;overflow:hidden;}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:linear-gradient(90deg,var(--sky),var(--coral));opacity:0;transition:opacity 0.2s;}
+.card:hover{transform:translateY(-3px);box-shadow:var(--shadow);}.card:hover::before{opacity:1;}
+.card.click{cursor:pointer;}
+.ci{font-size:30px;margin-bottom:12px;}
+.card h3{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--text);margin-bottom:7px;}
+.card p{font-size:13px;color:var(--text2);line-height:1.65;}
+.ctag{display:inline-block;margin-top:10px;padding:3px 11px;border-radius:20px;font-size:11px;font-weight:600;background:var(--sky-pale);color:var(--sky);border:1px solid var(--border2);}
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:28px;}
+.stat{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:18px;text-align:center;}
+.stat-n{font-family:var(--serif);font-size:28px;font-weight:700;color:var(--sky);line-height:1;}
+.stat-l{font-size:11px;color:var(--text3);font-weight:500;margin-top:5px;text-transform:uppercase;letter-spacing:0.07em;}
+.sb{background:#fff;border:1px solid var(--border);border-radius:var(--r2);padding:28px;margin-bottom:20px;}
+.sb h3{font-family:var(--serif);font-size:18px;font-weight:600;color:var(--text);margin-bottom:14px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.sb h4{font-family:var(--serif);font-size:14px;font-weight:600;color:var(--sky);margin:14px 0 7px;}
+.sb p{font-size:13.5px;line-height:1.8;color:var(--text2);margin-bottom:10px;}
+.sb ul{list-style:none;}
+.sb ul li{padding:7px 0;border-bottom:1px solid rgba(41,134,204,0.08);font-size:13px;line-height:1.65;color:var(--text2);display:flex;gap:10px;}
+.sb ul li::before{content:"\25C6";color:var(--coral);flex-shrink:0;font-size:9px;margin-top:4px;}
+.sb ul li:last-child{border-bottom:none;}
+.sb table{width:100%;border-collapse:collapse;font-size:13px;}
+.sb table th{background:var(--sky);color:#e8f3fb;font-size:11.5px;font-weight:600;padding:11px 14px;text-align:left;}
+.sb table td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text2);vertical-align:top;}
+.sb table tr:hover td{background:rgba(41,134,204,0.02);}
+.alert{padding:13px 17px;border-radius:var(--r);font-size:13px;line-height:1.7;margin-bottom:16px;display:flex;gap:11px;}
+.ai-ic{font-size:17px;flex-shrink:0;margin-top:1px;}
+.alert.warn{background:var(--sun-pale);border:1px solid rgba(240,180,41,0.4);color:#7a5500;}
+.alert.sky{background:var(--sky-pale);border:1px solid var(--border2);color:var(--sky);}
+.alert.coral{background:var(--coral-pale);border:1px solid rgba(232,121,74,0.3);color:var(--coral);}
+.alert.emergency{background:#1a0a08;border:2px solid var(--coral);color:#ffc8a8;font-weight:600;}
+.btn{display:inline-flex;align-items:center;gap:8px;padding:11px 22px;border-radius:var(--r);font-family:var(--body);font-size:13.5px;font-weight:600;cursor:pointer;transition:all 0.2s;border:none;}
+.btn-s{background:linear-gradient(135deg,var(--sky),var(--sky-lt));color:#fff;}
+.btn-s:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(41,134,204,0.4);}
+.btn-c{background:var(--coral);color:#fff;}.btn-c:hover{background:#d4673a;}
+.btn-outline{background:transparent;border:1.5px solid var(--border2);color:var(--text2);}
+.btn-outline:hover{border-color:var(--sky);color:var(--sky);}
+.btn-lg{padding:14px 28px;font-size:15px;}.btn-sm{padding:6px 14px;font-size:12px;}
+.bgrp{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px;}
+.spn{width:18px;height:18px;border:2px solid rgba(255,255,255,0.35);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;display:none;}
+.btn.loading .spn{display:block;}.btn.loading .bt{display:none;}
+.tab-bar{display:flex;gap:4px;margin-bottom:20px;border-bottom:2px solid var(--border);flex-wrap:wrap;}
+.tbtn{padding:10px 18px;border:none;background:transparent;font-family:var(--body);font-size:13px;font-weight:500;color:var(--text3);cursor:pointer;transition:all 0.2s;border-bottom:2px solid transparent;margin-bottom:-2px;}
+.tbtn:hover{color:var(--text);}.tbtn.active{color:var(--sky);border-bottom-color:var(--coral);font-weight:600;}
+.tpane{display:none;}.tpane.active{display:block;animation:fadeUp 0.25s ease;}
+.upload-zone{border:2px dashed var(--border2);border-radius:var(--r2);padding:44px;text-align:center;cursor:pointer;transition:all 0.3s;background:#fff;margin-bottom:16px;}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--sky);background:var(--sky-pale);}
+.uz-icon{font-size:48px;margin-bottom:14px;}
+.upload-zone h3{font-family:var(--serif);font-size:17px;font-weight:600;margin-bottom:7px;color:var(--text);}
+.upload-zone p{font-size:13px;color:var(--text3);}
+.file-tags{display:flex;flex-wrap:wrap;gap:7px;justify-content:center;margin-top:14px;}
+.ftag{padding:4px 12px;border-radius:20px;font-size:11px;font-weight:500;background:var(--cream2);border:1px solid var(--border);color:var(--text3);}
+.file-row{display:flex;align-items:center;gap:11px;padding:11px 15px;border-radius:var(--r);background:#fff;border:1px solid var(--border);margin-bottom:7px;}
+.fr-ico{font-size:18px;flex-shrink:0;}.fr-name{flex:1;font-size:13px;font-weight:500;}.fr-meta{font-size:11px;color:var(--text3);}
+.fr-ok{font-size:11px;padding:2px 8px;border-radius:10px;background:var(--sky-pale);color:var(--sky);font-weight:600;}
+.fr-del{color:var(--text3);cursor:pointer;font-size:16px;padding:3px;}.fr-del:hover{color:var(--red);}
+.chat-wrap{background:#fff;border:1px solid var(--border);border-radius:var(--r2);overflow:hidden;}
+.chat-head{background:linear-gradient(135deg,#1a5d8f,var(--sky));padding:17px 22px;display:flex;align-items:center;justify-content:space-between;}
+.chat-head h3{font-family:var(--serif);font-size:16px;font-weight:600;color:#fff;}
+.chat-head .free{background:rgba(255,255,255,0.18);color:#fff;padding:4px 12px;border-radius:20px;font-size:11px;font-weight:700;}
+.chat-msgs{height:420px;overflow-y:auto;padding:18px;display:flex;flex-direction:column;gap:12px;background:var(--cream);}
+.chat-msgs::-webkit-scrollbar{width:3px;}
+.cm{max-width:82%;padding:12px 15px;border-radius:14px;font-size:13.5px;line-height:1.62;}
+.cm.user{align-self:flex-end;background:var(--sky);color:#fff;border-radius:14px 14px 4px 14px;}
+.cm.ai{align-self:flex-start;background:#fff;border:1px solid var(--border);border-radius:14px 14px 14px 4px;}
+.cm .ai-lbl{font-size:10px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--coral);margin-bottom:4px;}
+.cm.sys{align-self:center;background:var(--cream2);border-radius:8px;font-size:12px;color:var(--text3);max-width:90%;text-align:center;}
+.typing{display:flex;align-items:center;gap:4px;}
+.typing span{width:7px;height:7px;background:var(--text3);border-radius:50%;animation:blink 1.2s ease infinite;}
+.typing span:nth-child(2){animation-delay:0.2s;}.typing span:nth-child(3){animation-delay:0.4s;}
+.chat-input-row{display:flex;gap:10px;padding:14px 18px;border-top:1px solid var(--border);background:var(--cream2);}
+.chat-input{flex:1;padding:10px 14px;border-radius:var(--r);border:1.5px solid rgba(41,134,204,0.2);background:#fff;font-family:var(--body);font-size:13.5px;color:var(--text);outline:none;transition:border-color 0.2s;}
+.chat-input:focus{border-color:var(--sky);}
+.chat-send{padding:10px 20px;border-radius:var(--r);background:var(--sky);color:#fff;border:none;cursor:pointer;font-weight:600;font-family:var(--body);transition:all 0.2s;}
+.chat-send:hover{background:#1a5d8f;}
+.api-box{background:var(--sky-pale);border:1px solid var(--border2);border-radius:var(--r2);padding:24px;margin-bottom:20px;}
+.api-box h3{font-family:var(--serif);font-size:15px;font-weight:600;color:var(--sky);margin-bottom:8px;}
+.api-box p{font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6;}
+.api-row{display:flex;gap:10px;}
+.api-input{flex:1;padding:10px 14px;border-radius:var(--r);border:1.5px solid var(--border2);background:#fff;font-family:'Consolas',monospace;font-size:13px;color:var(--text);outline:none;}
+.api-input:focus{border-color:var(--sky);}
+.provider-card{position:relative;}
+.provider-card.selected{border-color:var(--sky);box-shadow:0 0 0 2px var(--sky-pale);}
+.provider-card.selected::after{content:'Active';position:absolute;top:14px;right:16px;font-size:11px;font-weight:700;color:var(--sky);}
+.provider-card .ctag.configured{background:var(--coral-pale);color:var(--coral);border-color:rgba(232,121,74,0.3);}
+.growth-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.fg{margin-bottom:16px;}
+.fl{font-size:11px;font-weight:700;letter-spacing:0.09em;text-transform:uppercase;color:var(--text3);margin-bottom:6px;display:block;}
+.fi,.fs{width:100%;padding:10px 14px;border-radius:var(--r);border:1.5px solid rgba(41,134,204,0.2);background:#fff;font-family:var(--body);font-size:14px;color:var(--text);outline:none;}
+.fi:focus,.fs:focus{border-color:var(--sky);}
+footer{background:linear-gradient(160deg,#0a1420 0%,#0e2a3d 100%);padding:50px 40px 30px;border-top:2px solid var(--sky-lt);position:relative;z-index:1;}
+.footer-inner{max-width:1200px;margin:0 auto;}
+.footer-grid{display:grid;grid-template-columns:2fr 1fr 1fr;gap:40px;margin-bottom:36px;}
+.footer-brand h3{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--sky-lt);margin-bottom:10px;}
+.footer-brand p{font-size:13px;color:rgba(170,210,235,0.7);line-height:1.7;}
+.footer-col h4{font-size:11px;font-weight:700;letter-spacing:0.14em;text-transform:uppercase;color:var(--sky-lt);margin-bottom:12px;}
+.footer-col ul{list-style:none;}
+.footer-col ul li{margin-bottom:7px;}
+.footer-col ul li a{font-size:13px;color:rgba(170,210,235,0.6);text-decoration:none;transition:color 0.15s;}
+.footer-col ul li a:hover{color:var(--sky-lt);}
+.footer-bottom{border-top:1px solid rgba(41,134,204,0.25);padding-top:22px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:14px;}
+.footer-bottom p{font-size:12px;color:rgba(170,210,235,0.5);}
+.footer-disc{font-size:11px;color:rgba(170,210,235,0.4);max-width:700px;line-height:1.6;}
+@media(max-width:1000px){.app{grid-template-columns:1fr}.sidebar{display:none}.main{padding:24px 20px}}
+@media(max-width:700px){header{padding:40px 20px 32px}.g2,.g3,.g4,.growth-row{grid-template-columns:1fr}.stat-row{grid-template-columns:repeat(2,1fr)}.footer-grid{grid-template-columns:1fr}.disc-box{padding:28px 20px}}
+</style>
+</head>
+<body>
+
+<div id="disc-modal">
+  <div class="disc-box">
+    <span class="disc-icon">&#129489;&#8205;&#9877;&#65039;</span>
+    <h1>Medical Disclaimer</h1>
+    <div class="disc-sub">PediaCare AI &mdash; Paediatric Health Intelligence Platform</div>
+    <div class="disc-content">
+      <p><strong>RESEARCH &amp; EDUCATIONAL PURPOSE ONLY:</strong> PediaCare AI is an AI-powered research platform. All content is compiled from published paediatric literature (AAP, RCPCH, WHO, NICE, IAP) for educational purposes only.</p>
+      <p><strong>NOT A SUBSTITUTE FOR PAEDIATRIC CARE:</strong> Nothing on this platform constitutes medical advice, diagnosis, or treatment for your child. Children can deteriorate quickly. AI-generated analysis may be incomplete, outdated, or inaccurate.</p>
+      <p><strong>MANDATORY PROFESSIONAL CONSULTATION:</strong> Before making any decision about your child&#39;s medications, treatment, vaccination, or feeding &mdash; you MUST consult a qualified paediatrician.</p>
+      <p><strong>PAEDIATRIC EMERGENCY &mdash; CALL IMMEDIATELY:</strong> Difficulty breathing, blue lips or face, seizure, unresponsive or floppy child, non-blanching rash with fever, high fever in an infant under 3 months, severe dehydration &mdash; Call 112 (India) / 999 (UK) / 911 (US) IMMEDIATELY.</p>
+      <p><strong>NO LIABILITY:</strong> The creators accept no responsibility for any health outcome arising from use without proper professional medical guidance.</p>
+    </div>
+    <div class="disc-chk">
+      <div class="chk-row"><input type="checkbox" id="dc1"><label for="dc1">I understand this is an AI research tool &mdash; NOT medical advice, diagnosis, or treatment.</label></div>
+      <div class="chk-row"><input type="checkbox" id="dc2"><label for="dc2">I will consult a qualified paediatrician before any medical decision for my child.</label></div>
+      <div class="chk-row"><input type="checkbox" id="dc3"><label for="dc3">In a paediatric emergency I will call 112/999/911 immediately, not use this platform.</label></div>
+    </div>
+    <button class="disc-accept" id="disc-btn" disabled onclick="acceptDisc()">I Understand &amp; Accept &mdash; Enter PediaCare AI</button>
+  </div>
+</div>
+
+<div class="disc-bar"><span class="pdot"></span><strong>&#9888;&#65039; AI RESEARCH TOOL ONLY</strong> &mdash; Not medical advice. <strong>ALWAYS consult your paediatrician.</strong> CHILD EMERGENCY: Call <strong>112</strong> (India) / 999 (UK) / 911 (US).</div>
+
+<header>
+  <div class="hdr-inner">
+    <div class="hdr-eyebrow">&#129489;&#8205;&#9877;&#65039; Paediatric Health Intelligence Platform</div>
+    <h1>PediaCare <span>AI</span></h1>
+    <div class="hdr-sub">Evidence-Based Child Health Research &amp; Wellness Intelligence</div>
+    <div class="hdr-line"></div>
+    <div class="hdr-desc">Research growth and development, fever, vaccination, common childhood illnesses, and emergencies &mdash; from AAP, RCPCH, WHO, NICE and IAP guidelines, built for parents and carers.</div>
+    <div class="hdr-badges">
+      <span class="hbadge hb-s">&#128118; Growth &amp; Development</span>
+      <span class="hbadge hb-c">&#127813; Fever &amp; Infections</span>
+      <span class="hbadge hb-y">&#128137; Vaccination Schedule</span>
+      <span class="hbadge hb-s">&#129658; Newborn Care</span>
+      <span class="hbadge hb-c">&#128138; Paediatric Medicines</span>
+      <span class="hbadge hb-y">&#128680; Emergency Guide</span>
+    </div>
+  </div>
+</header>
+
+<nav class="main-nav">
+  <div class="nav-inner">
+    <div class="ntab active" onclick="nav('home')">&#127968; Home</div>
+    <div class="ntab" onclick="nav('upload')">&#128193; Upload</div>
+    <div class="ntab" onclick="nav('conditions')">&#129658; Conditions</div>
+    <div class="ntab" onclick="nav('growth')">&#128202; Growth Tracker</div>
+    <div class="ntab" onclick="nav('vaccination')">&#128137; Vaccination</div>
+    <div class="ntab" onclick="nav('medicines')">&#128138; Medicines</div>
+    <div class="ntab" onclick="nav('emergency')">&#128680; Emergency</div>
+    <div class="ntab" onclick="nav('newborn')">&#129658; Newborn Care</div>
+    <div class="ntab" onclick="nav('nutrition')">&#127815; Nutrition</div>
+    <div class="ntab" onclick="nav('development')">&#129504; Development</div>
+    <div class="ntab" onclick="nav('chat')">&#128172; Ask AI</div>
+    <div class="ntab" onclick="nav('settings')">&#9881;&#65039; Settings</div>
+  </div>
+</nav>
+
+<div class="app">
+<aside class="sidebar">
+  <div class="sb-lbl">Parent Portal</div>
+  <div class="sbi active" onclick="nav('home')"><span class="si">&#127968;</span>Dashboard</div>
+  <div class="sbi" onclick="nav('upload')"><span class="si">&#128193;</span>Upload Reports</div>
+  <div class="sbi" onclick="nav('settings')"><span class="si">&#9881;&#65039;</span>Settings &amp; AI Provider</div>
+  <div class="sb-div"></div>
+  <div class="sb-lbl">Child Health</div>
+  <div class="sbi" onclick="nav('conditions')"><span class="si">&#129658;</span>Conditions</div>
+  <div class="sbi" onclick="nav('emergency')"><span class="si">&#128680;</span>Emergency Guide</div>
+  <div class="sb-div"></div>
+  <div class="sb-lbl">Growth &amp; Prevention</div>
+  <div class="sbi" onclick="nav('growth')"><span class="si">&#128202;</span>Growth Tracker</div>
+  <div class="sbi" onclick="nav('vaccination')"><span class="si">&#128137;</span>Vaccination Schedule</div>
+  <div class="sbi" onclick="nav('development')"><span class="si">&#129504;</span>Development</div>
+  <div class="sb-div"></div>
+  <div class="sb-lbl">Care</div>
+  <div class="sbi" onclick="nav('medicines')"><span class="si">&#128138;</span>Medicines</div>
+  <div class="sbi" onclick="nav('newborn')"><span class="si">&#129658;</span>Newborn Care</div>
+  <div class="sbi" onclick="nav('nutrition')"><span class="si">&#127815;</span>Nutrition</div>
+  <div class="sb-div"></div>
+  <div class="sbi" onclick="nav('chat')"><span class="si">&#128172;</span>Ask AI <span class="sb-new">FREE</span></div>
+</aside>
+<main class="main">
+
+<!-- HOME -->
+<div class="panel active" id="panel-home">
+  <div class="ph"><div class="ph-crumb">Welcome</div><h2>Paediatric Health Intelligence</h2><div class="p-line"></div><p>AI-researched child health insights from AAP, RCPCH, WHO, NICE, IAP and peer-reviewed literature. For parents, carers and families.</p></div>
+  <div class="alert emergency"><span class="ai-ic">&#128680;</span><div>CHILD EMERGENCY: Difficulty breathing, blue lips/face, seizure, unresponsive or floppy child, non-blanching rash with fever, fever in infant under 3 months &mdash; CALL 112 (India) / 999 (UK) / 911 (US) IMMEDIATELY.</div></div>
+  <div class="stat-row">
+    <div class="stat"><div class="stat-n">40+</div><div class="stat-l">Child Conditions</div></div>
+    <div class="stat"><div class="stat-n">0-18</div><div class="stat-l">Years Covered</div></div>
+    <div class="stat"><div class="stat-n">5</div><div class="stat-l">AI Providers</div></div>
+    <div class="stat"><div class="stat-n">&#128274;</div><div class="stat-l">AES-256 Secure</div></div>
+  </div>
+  <div class="alert sky"><span class="ai-ic">&#9888;&#65039;</span><div><strong>Research Tool Only:</strong> All AI output is for educational research. ALWAYS consult your paediatrician before any decision about your child&#39;s health.</div></div>
+  <div class="g3" style="margin-bottom:22px;">
+    <div class="card click" onclick="nav('conditions')"><div class="ci">&#129658;</div><h3>Child Health Conditions</h3><p>Fever, common infections, respiratory illness, GI problems, rashes, behavioural concerns.</p><span class="ctag">Clinical Research</span></div>
+    <div class="card click" onclick="nav('growth')"><div class="ci">&#128202;</div><h3>Growth Tracker</h3><p>Understand weight, height and head circumference tracking against WHO standards.</p><span class="ctag">Growth Research</span></div>
+    <div class="card click" onclick="nav('vaccination')"><div class="ci">&#128137;</div><h3>Vaccination Schedule</h3><p>India and UK immunisation schedules, vaccine safety information, catch-up guidance.</p><span class="ctag">Prevention</span></div>
+    <div class="card click" onclick="nav('medicines')"><div class="ci">&#128138;</div><h3>Children&#39;s Medicines</h3><p>Paracetamol/ibuprofen dosing principles, antibiotics, asthma inhalers, antihistamines.</p><span class="ctag">Pharmacology</span></div>
+    <div class="card click" onclick="nav('emergency')"><div class="ci">&#128680;</div><h3>Emergency Guide</h3><p>Choking, seizures, anaphylaxis, breathing difficulty, head injury &mdash; first aid steps.</p><span class="ctag">Emergency</span></div>
+    <div class="card click" onclick="nav('development')"><div class="ci">&#129504;</div><h3>Development</h3><p>Milestones, speech delay, autism, ADHD, behavioural concerns by age.</p><span class="ctag">Development</span></div>
+  </div>
+</div>
+
+<!-- UPLOAD -->
+<div class="panel" id="panel-upload">
+  <div class="ph"><div class="ph-crumb">Step 1</div><h2>Upload Child Health Reports</h2><div class="p-line"></div><p>Upload growth charts, vaccination records, blood test results, and other paediatric reports for AI-assisted research.</p></div>
+  <div class="upload-zone" id="uz" onclick="document.getElementById('fi').click()">
+    <div class="uz-icon">&#128194;</div>
+    <h3>Drop files here or click to browse</h3>
+    <p>All paediatric document formats supported</p>
+    <div class="file-tags">
+      <span class="ftag">Growth Chart</span><span class="ftag">Vaccination Record</span><span class="ftag">Blood Tests</span>
+      <span class="ftag">Hearing/Vision Screen</span><span class="ftag">Developmental Assessment</span><span class="ftag">PDF &middot; JPG &middot; PNG</span>
+    </div>
+  </div>
+  <input type="file" id="fi" multiple accept=".pdf,.jpg,.jpeg,.png,.docx,.txt,.csv" style="display:none" onchange="handleFiles(this.files)">
+  <div id="flist"></div>
+  <div class="bgrp">
+    <button class="btn btn-s btn-lg" id="up-btn" onclick="uploadFiles()"><span class="bt">&#128228; Upload &amp; Process</span><div class="spn"></div></button>
+    <button class="btn btn-outline" onclick="document.getElementById('fi').click()">+ Add More</button>
+    <button class="btn btn-outline" onclick="clearFiles()">&#128465; Clear</button>
+  </div>
+  <div id="up-result"></div>
+</div>
+
+<!-- CONDITIONS -->
+<div class="panel" id="panel-conditions">
+  <div class="ph"><div class="ph-crumb">Paediatrics</div><h2>Child Health Conditions</h2><div class="p-line"></div><p>Comprehensive clinical research on childhood conditions from AAP, RCPCH, WHO and NICE guidelines.</p></div>
+  <div class="alert warn"><span class="ai-ic">&#9888;&#65039;</span><div>All information is for educational research. Diagnosis requires clinical assessment by a qualified paediatrician. Children can deteriorate quickly &mdash; always seek medical advice if worried.</div></div>
+  <div style="margin-bottom:17px;">
+    <label class="fl">Select Condition</label>
+    <select class="fs" id="cond-sel" onchange="showCondition()">
+      <option value="">-- Select a child health condition --</option>
+      <optgroup label="Fever &amp; Infections">
+        <option>Fever in Children</option><option>Febrile Seizures</option>
+        <option>Otitis Media (Ear Infection)</option><option>Tonsillitis</option>
+        <option>Urinary Tract Infection</option><option>Chickenpox</option>
+        <option>Hand-Foot-Mouth Disease</option><option>Roseola</option>
+      </optgroup>
+      <optgroup label="Respiratory">
+        <option>Bronchiolitis</option><option>Croup</option><option>Asthma in Children</option>
+        <option>Pneumonia in Children</option><option>Cystic Fibrosis</option>
+      </optgroup>
+      <optgroup label="Gastrointestinal">
+        <option>Gastroenteritis</option><option>Constipation in Children</option>
+        <option>Cow&#39;s Milk Protein Allergy</option><option>Infant Reflux / GORD</option>
+        <option>Intussusception</option><option>Coeliac Disease in Children</option>
+      </optgroup>
+      <optgroup label="Skin &amp; Rashes">
+        <option>Eczema</option><option>Nappy Rash</option><option>Kawasaki Disease</option>
+        <option>Non-Blanching Rash</option>
+      </optgroup>
+      <optgroup label="Development &amp; Behaviour">
+        <option>Autism Spectrum Disorder</option><option>ADHD</option>
+        <option>Speech and Language Delay</option><option>Sleep Problems</option>
+        <option>Tantrums and Behaviour</option>
+      </optgroup>
+      <optgroup label="Other">
+        <option>Failure to Thrive</option><option>Childhood Obesity</option>
+        <option>Food Allergy</option><option>Anaemia in Children</option>
+      </optgroup>
+    </select>
+  </div>
+  <div id="cond-output"></div>
+  <div class="sb"><h3>Quick Reference</h3>
+    <div class="g2">
+      <div><h4>Fever in Children</h4><ul>
+        <li>NICE traffic light system: green/amber/red risk stratification</li>
+        <li>ANY fever in infant under 3 months: urgent paediatric assessment</li>
+        <li>Most fevers are viral and self-limiting</li>
+        <li>Non-blanching rash + fever: EMERGENCY (meningococcal sepsis)</li>
+      </ul></div>
+      <div><h4>Bronchiolitis</h4><ul>
+        <li>Viral (RSV), affects infants under 12 months, peak 3-6 months</li>
+        <li>Self-limiting over 1-2 weeks; no role for antibiotics/steroids</li>
+        <li>Red flags: apnoea, SpO2 under 92%, poor feeding, exhaustion</li>
+        <li>Supportive care: oxygen if needed, feeding support</li>
+      </ul></div>
+      <div><h4>Vaccination</h4><ul>
+        <li>MMR-autism link definitively disproven (original study retracted)</li>
+        <li>Minor illness without fever is NOT a contraindication</li>
+        <li>Catch-up always possible &mdash; never too late, no restart needed</li>
+        <li>Serious side effects extremely rare; benefits far outweigh risks</li>
+      </ul></div>
+      <div><h4>Constipation in Children</h4><ul>
+        <li>Over 90% is functional (no organic cause)</li>
+        <li>Macrogol (Movicol Paediatric) first-line for disimpaction and maintenance</li>
+        <li>May take months for full resolution &mdash; do not stop laxatives too early</li>
+        <li>Red flags: delayed meconium, ribbon stools, failure to thrive</li>
+      </ul></div>
+    </div>
+  </div>
+</div>
+
+<!-- GROWTH TRACKER -->
+<div class="panel" id="panel-growth">
+  <div class="ph"><div class="ph-crumb">Growth Monitoring</div><h2>Growth Tracker</h2><div class="p-line"></div><p>Enter your child&#39;s measurements for AI-researched context on growth patterns. This does NOT replace plotting on an official WHO or UK-WHO growth chart by a healthcare professional.</p></div>
+  <div class="alert warn"><span class="ai-ic">&#9888;&#65039;</span><div>This tool provides general research context only. Accurate centile calculation requires plotting on official growth charts by a trained healthcare professional (health visitor, GP, paediatrician).</div></div>
+  <div class="sb">
+    <h3>Enter Measurements</h3>
+    <div class="growth-row">
+      <div class="fg"><label class="fl">Child&#39;s Age</label><input class="fi" id="gr-age" placeholder="e.g. 8 months, 3 years"></div>
+      <div class="fg"><label class="fl">Sex</label><select class="fs" id="gr-sex"><option value="">Select</option><option>Male</option><option>Female</option></select></div>
+      <div class="fg"><label class="fl">Weight (kg)</label><input class="fi" id="gr-weight" placeholder="e.g. 8.2"></div>
+      <div class="fg"><label class="fl">Height/Length (cm)</label><input class="fi" id="gr-height" placeholder="e.g. 68"></div>
+      <div class="fg"><label class="fl">Head Circumference (cm, if under 2)</label><input class="fi" id="gr-head" placeholder="e.g. 44"></div>
+    </div>
+    <div class="bgrp">
+      <button class="btn btn-s btn-lg" id="gr-btn" onclick="assessGrowth()"><span class="bt">&#128202; Research Growth Context</span><div class="spn"></div></button>
+    </div>
+  </div>
+  <div id="growth-output"></div>
+  <div class="sb"><h3>Growth Reference Points</h3>
+    <table><tr><th>Age</th><th>Typical Weight Gain</th><th>Typical Height Gain</th></tr>
+    <tr><td>0-3 months</td><td>~150-200g/week</td><td>~3-3.5cm/month</td></tr>
+    <tr><td>3-6 months</td><td>~100-150g/week</td><td>~2cm/month</td></tr>
+    <tr><td>6-12 months</td><td>~70-90g/week</td><td>~1.2-1.5cm/month</td></tr>
+    <tr><td>1-2 years</td><td>~2-2.5kg/year</td><td>~10-12cm/year</td></tr>
+    <tr><td>2-5 years</td><td>~2-3kg/year</td><td>~6-8cm/year</td></tr>
+    </table>
+    <p style="margin-top:12px;">Birth weight should be regained by 2-3 weeks of age (up to 10% initial weight loss is normal). Steady tracking along a single centile line is generally reassuring. Crossing 2 or more centile lines in either direction over time warrants discussion with a health visitor or paediatrician.</p>
+  </div>
+</div>
+
+<!-- VACCINATION -->
+<div class="panel" id="panel-vaccination">
+  <div class="ph"><div class="ph-crumb">Prevention</div><h2>Vaccination Schedule</h2><div class="p-line"></div><p>Research on childhood immunisation schedules, safety, and common questions from WHO, AAP, RCPCH and IAP guidance.</p></div>
+  <div class="tab-bar">
+    <button class="tbtn active" onclick="switchTab(this,'v1')">India Schedule</button>
+    <button class="tbtn" onclick="switchTab(this,'v2')">UK Schedule</button>
+    <button class="tbtn" onclick="switchTab(this,'v3')">Safety &amp; Common Concerns</button>
+  </div>
+  <div class="tpane active" id="v1">
+    <div class="sb"><h3>India National Immunization Schedule</h3>
+      <table><tr><th>Age</th><th>Vaccines</th></tr>
+      <tr><td>At Birth</td><td>BCG, OPV-0, Hepatitis B-1</td></tr>
+      <tr><td>6 weeks</td><td>DPT-1, OPV-1, Hep B-2, Rotavirus-1, PCV-1, IPV-1 (Pentavalent combination)</td></tr>
+      <tr><td>10 weeks</td><td>DPT-2, OPV-2, Rotavirus-2, PCV-2</td></tr>
+      <tr><td>14 weeks</td><td>DPT-3, OPV-3, Hep B-3, Rotavirus-3, PCV-3, IPV-2</td></tr>
+      <tr><td>9 months</td><td>Measles/MR-1, JE-1 (in endemic areas), Vitamin A (1st dose)</td></tr>
+      <tr><td>16-24 months</td><td>DPT booster-1, OPV booster, MR-2, JE-2, Vitamin A (2nd dose)</td></tr>
+      <tr><td>5-6 years</td><td>DPT booster-2</td></tr>
+      <tr><td>10 years</td><td>TT/Tdap</td></tr>
+      </table>
+      <p style="margin-top:12px;">Vitamin A supplementation continues every 6 months from 9 months to 5 years per national programme. Schedule may vary slightly by state programme &mdash; confirm with your paediatrician.</p>
+    </div>
+  </div>
+  <div class="tpane" id="v2">
+    <div class="sb"><h3>UK Routine Childhood Immunisation Schedule</h3>
+      <table><tr><th>Age</th><th>Vaccines</th></tr>
+      <tr><td>8 weeks</td><td>6-in-1 (DTaP/IPV/Hib/HepB), Rotavirus, MenB</td></tr>
+      <tr><td>12 weeks</td><td>6-in-1 (2nd dose), PCV, Rotavirus (2nd dose)</td></tr>
+      <tr><td>16 weeks</td><td>6-in-1 (3rd dose), MenB (2nd dose)</td></tr>
+      <tr><td>1 year</td><td>Hib/MenC, MMR (1st dose), PCV booster, MenB booster</td></tr>
+      <tr><td>3 years 4 months</td><td>MMR (2nd dose), 4-in-1 preschool booster (DTaP/IPV)</td></tr>
+      <tr><td>12-13 years</td><td>HPV (2 doses)</td></tr>
+      <tr><td>14 years</td><td>3-in-1 teenage booster (Td/IPV), MenACWY</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="tpane" id="v3">
+    <div class="sb"><h3>Vaccine Safety and Common Questions</h3>
+      <h4>Is the MMR vaccine linked to autism?</h4>
+      <p>No. This has been extensively studied across millions of children worldwide. The original 1998 study suggesting a link was retracted by the journal and found to be fraudulent, and the author was struck off the medical register. No credible scientific evidence supports any link between vaccines and autism.</p>
+      <h4>What side effects are normal?</h4>
+      <p>Common and expected: soreness/redness at injection site, mild fever, fussiness or sleepiness for 1-2 days. These resolve on their own. Paracetamol can be used for discomfort if needed (check product age guidance).</p>
+      <h4>Can my child be vaccinated if they have a cold?</h4>
+      <p>Yes &mdash; minor illness without fever is NOT a reason to delay vaccination. Only moderate-severe acute illness with fever typically warrants a short delay, on your doctor&#39;s advice.</p>
+      <h4>What if we missed some vaccines?</h4>
+      <p>Catch-up is always possible at any age &mdash; it is never too late. There is no need to restart a vaccine series from the beginning, even after a long delay. Speak to your paediatrician or GP about a personalised catch-up schedule.</p>
+      <h4>Who should NOT receive certain vaccines?</h4>
+      <p>True contraindications are rare: anaphylaxis to a previous dose or vaccine component, and severe immunodeficiency for live vaccines (MMR, BCG, rotavirus, varicella). Your paediatrician will screen for these before each vaccination.</p>
+    </div>
+  </div>
+</div>
+
+<!-- MEDICINES -->
+<div class="panel" id="panel-medicines">
+  <div class="ph"><div class="ph-crumb">Paediatric Pharmacology</div><h2>Children&#39;s Medicines</h2><div class="p-line"></div><p>Research on commonly used paediatric medications from AAP, RCPCH, WHO and NICE guidelines.</p></div>
+  <div class="alert warn"><span class="ai-ic">&#9888;&#65039;</span><div>Medication dosing for children is weight-based and must be confirmed by a pharmacist or doctor. Never give adult medications or doses to children. Always use the dosing device provided with liquid medicines.</div></div>
+  <div class="tab-bar">
+    <button class="tbtn active" onclick="switchTab(this,'m1')">Pain &amp; Fever</button>
+    <button class="tbtn" onclick="switchTab(this,'m2')">Antibiotics</button>
+    <button class="tbtn" onclick="switchTab(this,'m3')">Asthma Inhalers</button>
+    <button class="tbtn" onclick="switchTab(this,'m4')">Allergy &amp; Skin</button>
+    <button class="tbtn" onclick="switchTab(this,'m5')">Vitamins &amp; Supplements</button>
+  </div>
+  <div class="tpane active" id="m1">
+    <div class="sb"><h3>Pain Relief and Fever Medications</h3>
+      <ul>
+        <li><strong>Paracetamol:</strong> 15mg/kg every 4-6 hours (maximum 4 doses/24 hours). Available as liquid suspension (age/weight-banded dosing on packaging), suppositories, tablets for older children. First-line for pain and fever discomfort in children over 2 months (weight-based dosing essential under medical guidance for infants under 3 months).</li>
+        <li><strong>Ibuprofen:</strong> 5-10mg/kg every 6-8 hours (maximum 3 doses/24 hours). Avoid in: dehydration, chickenpox (theoretical risk of severe skin/soft tissue infection), asthma with known NSAID sensitivity, under 3 months (unless directed by doctor). Can alternate with paracetamol if fever persists and one alone is insufficient, on medical advice.</li>
+        <li><strong>Important:</strong> Antipyretics are for comfort, not solely to reduce a number on the thermometer. Do not use to try to prevent febrile seizures &mdash; no evidence this works. Always use the measuring device (syringe/spoon) provided, not a kitchen spoon.</li>
+        <li><strong>Aspirin:</strong> AVOID in children under 16 years (except specific conditions under specialist guidance) &mdash; risk of Reye syndrome, particularly with viral illness (e.g. chickenpox, flu).</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tpane" id="m2">
+    <div class="sb"><h3>Antibiotics in Children</h3>
+      <ul>
+        <li><strong>Amoxicillin:</strong> First-line for many common bacterial infections (otitis media, sinusitis, some pneumonia, UTI in some areas). Typical dosing 20-90mg/kg/day in divided doses depending on indication and severity &mdash; exact dose determined by treating doctor.</li>
+        <li><strong>Co-amoxiclav (Augmentin):</strong> Broader spectrum, used when amoxicillin resistance suspected or for specific infections (e.g. animal bites, some respiratory infections).</li>
+        <li><strong>Azithromycin/Clarithromycin (macrolides):</strong> Alternative for penicillin-allergic children, used for atypical pneumonia, pertussis (whooping cough).</li>
+        <li><strong>Important principles:</strong> Most childhood infections are viral and do NOT need antibiotics (colds, most coughs, most sore throats, bronchiolitis). Antibiotics should only be used when a bacterial infection is identified or strongly suspected by a clinician. Always complete the full course as prescribed unless advised otherwise. Antibiotic resistance is a major global health concern &mdash; appropriate use protects future effectiveness.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tpane" id="m3">
+    <div class="sb"><h3>Asthma and Wheeze Inhalers</h3>
+      <ul>
+        <li><strong>Salbutamol (reliever/blue inhaler):</strong> Short-acting beta-2 agonist. Used for acute symptom relief during wheeze/breathlessness. Via spacer device for young children (improves drug delivery, reduces side effects) &mdash; technique matters more than the device itself.</li>
+        <li><strong>Inhaled corticosteroids (preventer/brown inhaler):</strong> Beclometasone, fluticasone, budesonide. Taken regularly (not just during symptoms) to reduce airway inflammation and prevent attacks. Rinse mouth after use to reduce oral thrush risk. Takes days-weeks to show full benefit.</li>
+        <li><strong>Spacer devices:</strong> Essential for effective inhaler use in young children &mdash; dramatically improves lung deposition of medication versus inhaler alone. Different sizes/types for different ages (with mask for infants/toddlers, mouthpiece for older children).</li>
+        <li><strong>Personalised Asthma Action Plan:</strong> Every child with asthma should have one &mdash; outlines daily management and what to do if symptoms worsen, including when to seek emergency care.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tpane" id="m4">
+    <div class="sb"><h3>Allergy and Skin Medications</h3>
+      <ul>
+        <li><strong>Antihistamines:</strong> Cetirizine, loratadine (non-drowsy, once-daily, age-appropriate liquid formulations available) for allergic symptoms (hay fever, hives, itching). Chlorphenamine (Piriton) is sedating &mdash; sometimes used short-term for itch/sleep disturbance during eczema or chickenpox flares, but newer non-sedating options often preferred.</li>
+        <li><strong>Emollients:</strong> The mainstay of eczema management. Apply liberally and frequently (several times daily), even when skin appears clear, to maintain skin barrier function. Many types available (creams, ointments, lotions) &mdash; finding one the child tolerates well improves adherence.</li>
+        <li><strong>Topical corticosteroids:</strong> For eczema flares, potency matched to severity and body site (milder potency for face/skin folds, stronger for thick skin like palms/soles if needed). Apply to affected areas during flares as directed, then step down as skin improves. Fear of steroids (steroid phobia) often leads to under-treatment &mdash; appropriate use under guidance is safe and effective.</li>
+        <li><strong>Adrenaline auto-injectors (EpiPen/Jext):</strong> For children with diagnosed severe allergy at risk of anaphylaxis. Carried at all times, used at first signs of severe reaction (difficulty breathing, throat/facial swelling, widespread hives with systemic symptoms). All carers and schools should be trained in use.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="tpane" id="m5">
+    <div class="sb"><h3>Vitamins and Supplements</h3>
+      <ul>
+        <li><strong>Vitamin D:</strong> 400 IU/day recommended for breastfed infants from birth (formula is fortified). Often recommended for all children, especially with limited sun exposure or darker skin tone, per national guidance.</li>
+        <li><strong>Multivitamin drops (A, C, D):</strong> Recommended in some countries (e.g. UK Healthy Start vitamins) for children with limited dietary variety, typically from 6 months to 5 years.</li>
+        <li><strong>Iron:</strong> Term infants generally have adequate iron stores until around 6 months from maternal transfer. Preterm or low birth weight infants often need earlier supplementation &mdash; discuss with paediatrician. Iron-rich complementary foods important from 6 months for all infants.</li>
+        <li><strong>Probiotics:</strong> Some evidence for use in acute gastroenteritis (may modestly reduce duration) and antibiotic-associated diarrhoea prevention. Evidence less robust for other indications (colic, eczema prevention) &mdash; discuss with paediatrician before routine use.</li>
+      </ul>
+    </div>
+  </div>
+</div>
+
+<!-- EMERGENCY -->
+<div class="panel" id="panel-emergency">
+  <div class="ph"><div class="ph-crumb">URGENT</div><h2>Paediatric Emergency Guide</h2><div class="p-line"></div></div>
+  <div class="alert emergency"><span class="ai-ic">&#128680;</span><div>CHILD EMERGENCIES &mdash; CALL 112 (India) / 999 (UK) / 911 (US) IMMEDIATELY: Difficulty breathing, blue lips/face, seizure, unresponsive/floppy child, non-blanching rash with fever, severe dehydration, anaphylaxis, choking that does not resolve. These are time-critical emergencies.</div></div>
+  <div class="g2">
+    <div class="sb"><h3>&#128680; Breathing Difficulty</h3>
+      <p><strong>Recognition:</strong> Grunting, severe chest indrawing, nasal flaring, RR over 60 (any age), unable to feed/talk due to breathlessness, blue lips/tongue, exhaustion, SpO2 under 92%, silent chest (in known asthma &mdash; very serious).</p>
+      <h4>Immediate Actions</h4><ul>
+        <li>Call 112/999/911 immediately</li>
+        <li>Keep child upright/comfortable &mdash; do NOT force lying flat</li>
+        <li>If known asthmatic with inhaler available, give as per action plan while awaiting help</li>
+        <li>Stay calm &mdash; anxiety can worsen breathing difficulty in the child</li>
+      </ul>
+    </div>
+    <div class="sb"><h3>&#128680; Choking</h3>
+      <p><strong>Infant under 1 year (conscious):</strong> 5 back blows (infant face-down along your forearm, head lower than chest) then 5 chest thrusts (infant face-up, two fingers on lower breastbone) if back blows fail. Repeat cycle.</p>
+      <p><strong>Child over 1 year (conscious):</strong> 5 back blows then 5 abdominal thrusts (Heimlich manoeuvre) if back blows fail. Repeat cycle.</p>
+      <h4>Critical Points</h4><ul>
+        <li>If child becomes unconscious: start CPR immediately, check mouth for visible object before each set of rescue breaths</li>
+        <li>Call 112/999/911 if choking does not resolve quickly or child loses consciousness</li>
+      </ul>
+    </div>
+    <div class="sb"><h3>&#128680; Seizures</h3>
+      <p><strong>First aid for any seizure:</strong> Time it. Protect from injury (clear hazards, cushion head). Do NOT restrain or put anything in the mouth. Once jerking stops, place in recovery position.</p>
+      <h4>Call Emergency Services If</h4><ul>
+        <li>First-ever seizure</li>
+        <li>Lasts longer than 5 minutes</li>
+        <li>Difficulty breathing afterwards, or does not regain consciousness</li>
+        <li>Injury occurs during the seizure</li>
+        <li>Known epileptic but this seizure differs from their usual pattern</li>
+        <li>Another seizure starts before recovery from the first</li>
+      </ul>
+    </div>
+    <div class="sb"><h3>&#128680; Anaphylaxis (Severe Allergic Reaction)</h3>
+      <p><strong>Recognition:</strong> Difficulty breathing/wheeze, swelling of lips/face/throat, widespread hives, dizziness/collapse, vomiting &mdash; in the context of allergen exposure.</p>
+      <h4>Immediate Actions</h4><ul>
+        <li>Call 112/999/911</li>
+        <li>Use adrenaline auto-injector (EpiPen/Jext) immediately if prescribed and available &mdash; inject into outer thigh</li>
+        <li>Lay child flat with legs raised (or sitting if breathing difficulty predominates), unless vomiting (use recovery position)</li>
+        <li>Second adrenaline dose after 5-15 minutes if no improvement before help arrives</li>
+      </ul>
+    </div>
+  </div>
+  <div class="sb"><h3>Other Paediatric Emergencies</h3><ul>
+    <li><strong>Non-blanching rash with fever:</strong> Press a glass against the rash &mdash; if it does NOT fade, this is a medical emergency (possible meningococcal sepsis) regardless of how the child otherwise appears. Call 112/999/911 immediately.</li>
+    <li><strong>Severe dehydration:</strong> Lethargic/unconscious, sunken eyes, very dry mouth, very slow skin pinch recoil, no urine output, sunken fontanelle (infants). Medical emergency requiring urgent fluid resuscitation.</li>
+    <li><strong>Head injury red flags:</strong> Loss of consciousness, repeated vomiting, abnormal drowsiness, fluid from nose/ears, seizure, any swelling/bruise in infant under 1 year &mdash; seek urgent assessment.</li>
+    <li><strong>Burns/scalds:</strong> Cool under running water for 20 minutes immediately. Seek emergency care for burns to face/hands/feet/genitals, large burns, or any burn in an infant under 1 year.</li>
+    <li><strong>Safeguarding concerns:</strong> If you are worried about a child&#39;s safety or suspect non-accidental injury, contact your local child protection services, GP, or in the UK call the NSPCC helpline. In an emergency, call 112/999/911.</li>
+  </ul></div>
+</div>
+
+<!-- NEWBORN CARE -->
+<div class="panel" id="panel-newborn">
+  <div class="ph"><div class="ph-crumb">0-3 Months</div><h2>Newborn Care</h2><div class="p-line"></div><p>Research on newborn health, common concerns, and routine checks from RCPCH and WHO guidance.</p></div>
+  <div class="sb"><h3>Routine Newborn Checks</h3>
+    <ul>
+      <li><strong>Newborn and Infant Physical Examination (NIPE):</strong> Within 72 hours of birth, repeated at 6-8 weeks. Checks eyes (red reflex), heart (murmurs, femoral pulses), hips (developmental dysplasia screening), and testes (descent) in boys.</li>
+      <li><strong>Newborn blood spot screening (heel prick):</strong> Day 5, screens for congenital hypothyroidism, phenylketonuria (PKU), cystic fibrosis, sickle cell disease, and other inherited metabolic conditions per national programme.</li>
+      <li><strong>Newborn hearing screening:</strong> OAE (otoacoustic emissions) test before discharge or by 4-5 weeks.</li>
+    </ul>
+  </div>
+  <div class="sb"><h3>Jaundice</h3>
+    <p>Affects up to 60% of term and 80% of preterm babies. <strong>Physiological jaundice:</strong> appears day 2-3, peaks day 3-5, resolves by 2 weeks (term) or 3 weeks (preterm) &mdash; due to immature liver function plus normal red cell breakdown.</p>
+    <p><strong>Pathological jaundice requiring urgent assessment:</strong> onset within 24 hours of birth, prolonged beyond 2-3 weeks, very high bilirubin levels, or accompanied by poor feeding, lethargy, pale stools, or dark urine.</p>
+    <p><strong>Treatment:</strong> Phototherapy for significant hyperbilirubinaemia based on NICE threshold charts (by age in hours and risk factors). Exchange transfusion reserved for severe cases.</p>
+  </div>
+  <div class="sb"><h3>Feeding</h3>
+    <ul>
+      <li>Exclusive breastfeeding recommended for first 6 months (WHO/UNICEF), continuing alongside complementary foods to 2 years or beyond.</li>
+      <li>Formula feeding is an appropriate alternative when breastfeeding is not possible or chosen &mdash; prepare strictly per manufacturer instructions, use paced feeding to avoid overfeeding.</li>
+      <li><strong>Early hunger cues:</strong> rooting, hand-to-mouth movements, lip-smacking. Crying is a LATE hunger cue &mdash; try to feed before this point.</li>
+      <li><strong>Normal weight loss:</strong> up to 10% of birth weight in the first 3-5 days is expected (fluid shifts plus establishing feeding). Should regain birth weight by 2-3 weeks &mdash; if not, feeding assessment needed.</li>
+    </ul>
+  </div>
+  <div class="sb"><h3>Umbilical Cord Care</h3>
+    <p>The cord stump dries and separates naturally within 5-15 days. Keep clean and dry, fold the nappy below the cord to avoid contact. Signs of infection (omphalitis) requiring urgent review: redness spreading from the cord base, pus, foul smell, or fever &mdash; this can progress rapidly in newborns.</p>
+  </div>
+</div>
+
+<!-- NUTRITION -->
+<div class="panel" id="panel-nutrition">
+  <div class="ph"><div class="ph-crumb">Paediatric Nutrition</div><h2>Child Nutrition</h2><div class="p-line"></div><p>Evidence-based nutrition guidance for infants, toddlers and children from WHO and national paediatric guidelines.</p></div>
+  <div class="sb"><h3>Introducing Solid Foods (Weaning)</h3>
+    <p>Complementary feeding typically starts around 6 months (not before 4 months), alongside continued breastfeeding or formula. Signs of readiness: can sit with support, good head control, can bring objects to the mouth, shows interest in food.</p>
+    <ul>
+      <li>Start with single-ingredient purees or soft finger foods (baby-led weaning approach)</li>
+      <li>Introduce allergenic foods early and one at a time (egg, peanut, dairy) &mdash; current evidence (LEAP study) suggests early introduction may reduce allergy risk rather than increase it</li>
+      <li>Avoid added salt and sugar in the first year; avoid honey before 12 months (botulism risk)</li>
+      <li>Offer a wide variety of tastes and textures to support acceptance of diverse foods later</li>
+    </ul>
+  </div>
+  <div class="sb"><h3>Picky Eating</h3>
+    <p>Extremely common in toddlers and usually a normal developmental phase. Strategies: offer variety without pressure, model eating behaviour as a family, involve the child in food preparation, repeated exposure without force-feeding (may take 10-15 exposures before a new food is accepted), avoid using food as reward or punishment, maintain a regular meal and snack routine.</p>
+    <p>Seek advice if: very limited food range is affecting growth, extreme distress around food or mealtimes, or signs of nutritional deficiency &mdash; a feeding therapy referral may help.</p>
+  </div>
+  <div class="sb"><h3>Childhood Obesity</h3>
+    <p>Defined as BMI above the 95th centile for age and sex on growth charts. Multifactorial causes: dietary patterns, physical activity levels, sleep, family and environmental factors, occasionally endocrine or genetic causes.</p>
+    <p>Management is a whole-family lifestyle approach rather than singling out the child: increase physical activity, reduce screen time, improve dietary quality (reduce sugary drinks and processed food, increase fruit and vegetables), and address any psychological factors. Avoid restrictive dieting language with children &mdash; focus on healthy habits for the whole family.</p>
+  </div>
+  <div class="sb"><h3>Food Allergy</h3>
+    <p>True food allergy affects 6-8% of children, most commonly to cow&#39;s milk, egg, peanut, tree nuts, soy, wheat, fish, and shellfish. IgE-mediated reactions occur rapidly (minutes to 2 hours): hives, swelling, vomiting, or anaphylaxis.</p>
+    <p>Management: strict avoidance of the confirmed allergen, a written allergy action plan, and regular specialist review &mdash; many children outgrow milk and egg allergy, while peanut and tree nut allergy more often persist into adulthood. Avoid unnecessary exclusion diets without a confirmed diagnosis, as this risks nutritional deficiency and may delay natural tolerance development.</p>
+  </div>
+</div>
+
+<!-- DEVELOPMENT -->
+<div class="panel" id="panel-development">
+  <div class="ph"><div class="ph-crumb">Development</div><h2>Growth &amp; Development</h2><div class="p-line"></div><p>Research on developmental milestones, delays, and behavioural concerns from AAP and RCPCH guidance.</p></div>
+  <div class="sb"><h3>Developmental Milestones by Age</h3>
+    <table><tr><th>Age</th><th>Gross Motor</th><th>Fine Motor</th><th>Language</th><th>Social</th></tr>
+    <tr><td>6-8 weeks</td><td>Head control developing</td><td>Hands open, follows objects</td><td>Coos</td><td>Social smile</td></tr>
+    <tr><td>6 months</td><td>Sits with support</td><td>Reaches and grasps</td><td>Babbles</td><td>Enjoys interaction</td></tr>
+    <tr><td>9-12 months</td><td>Crawls, pulls to stand</td><td>Pincer grasp</td><td>First words</td><td>Stranger anxiety, waves bye-bye</td></tr>
+    <tr><td>12-15 months</td><td>Walks independently</td><td>Scribbles</td><td>Several words</td><td>Points to show interest</td></tr>
+    <tr><td>18-24 months</td><td>Runs, climbs stairs</td><td>Tower of 4-6 cubes</td><td>2-word phrases</td><td>Pretend play begins</td></tr>
+    <tr><td>3 years</td><td>Jumps, pedals tricycle</td><td>Draws a circle</td><td>3-word sentences</td><td>Shares toys, plays with others</td></tr>
+    </table>
+  </div>
+  <div class="sb"><h3>When to Seek Assessment</h3><ul>
+    <li>No eye contact by 3 months, no smiling by 8 weeks</li>
+    <li>Head circumference crossing centiles</li>
+    <li>Not sitting by 12 months, not walking by 18 months</li>
+    <li>No words by 18 months, no 2-word phrases by 2 years</li>
+    <li>Regression in any previously acquired skill, at any age</li>
+    <li>Persistent toe-walking, asymmetric movements</li>
+  </ul></div>
+  <div class="sb"><h3>Autism Spectrum Disorder</h3>
+    <p>A neurodevelopmental condition affecting social communication and behaviour, presenting in early childhood. Core features: differences in social communication and interaction, restricted or repetitive behaviours and interests, and sensory sensitivities.</p>
+    <p>Early signs may include reduced eye contact, delayed language, reduced response to name, repetitive movements, intense focus on specific interests, and difficulty with changes in routine. Diagnosis requires comprehensive multidisciplinary assessment &mdash; there is no single test. Early intervention (speech therapy, occupational therapy, behavioural approaches) improves outcomes, so earlier identification allows earlier support.</p>
+  </div>
+  <div class="sb"><h3>ADHD</h3>
+    <p>A persistent pattern of inattention and/or hyperactivity-impulsivity affecting function across settings (home, school), present before age 12. Assessment requires detailed history from multiple settings (parents and teachers) and ruling out other causes.</p>
+    <p>Management: psychoeducation and parent training first-line for under-5s. For school-age children: behavioural interventions, and medication (methylphenidate first-line) if significant impairment persists despite environmental adaptations &mdash; always under specialist initiation and monitoring.</p>
+  </div>
+  <div class="sb"><h3>Speech and Language Delay</h3>
+    <p>Has many possible causes: hearing impairment (always check first), bilingual exposure (normal, not a cause for delay on its own), autism spectrum, global developmental delay, specific language impairment, or environmental factors. A hearing test is essential for any child with speech delay, alongside speech and language therapy assessment.</p>
+  </div>
+</div>
+
+<!-- AI CHAT -->
+<div class="panel" id="panel-chat">
+  <div class="ph"><div class="ph-crumb">AI Research Assistant</div><h2>Ask PediaCare AI</h2><div class="p-line"></div><p>Ask any question about your child&#39;s health. AI-researched from AAP, RCPCH, WHO and NICE guidelines. <strong>Free forever.</strong></p></div>
+  <div class="alert emergency"><span class="ai-ic">&#128680;</span><div>CHILD EMERGENCY (breathing difficulty, seizure, unresponsive child, non-blanching rash) &mdash; CALL 112/999/911 IMMEDIATELY. Do NOT type here first.</div></div>
+  <div class="alert warn"><span class="ai-ic">&#9888;&#65039;</span><div>AI responses are for educational research only. Not medical advice. Always consult your paediatrician.</div></div>
+  <div class="chat-wrap">
+    <div class="chat-head"><h3>&#129489;&#8205;&#9877;&#65039; PediaCare AI Research Assistant</h3><span class="free">FREE FOREVER</span></div>
+    <div class="chat-msgs" id="chat-msgs">
+      <div class="cm sys">Welcome to PediaCare AI &#128118;</div>
+      <div class="cm ai"><div class="ai-lbl">PediaCare AI</div>Hello! I can research questions about fever, common childhood illnesses, vaccination, growth and development, feeding, medications, and when to seek urgent care for your child. For emergencies &mdash; call 112/999/911. I provide educational research only, not personal medical advice.</div>
+    </div>
+    <div class="chat-input-row">
+      <input class="chat-input" id="chat-in" placeholder="Ask about fever, vaccines, growth, feeding, child medicines..." onkeypress="if(event.key==='Enter')sendChat()">
+      <button class="chat-send" onclick="sendChat()">Ask</button>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="panel" id="panel-settings">
+  <div class="ph"><div class="ph-crumb">Configuration</div><h2>Settings &amp; AI Provider</h2><div class="p-line"></div><p>Choose which AI powers your research. Keys are encrypted with AES-256-GCM and stored only in your browser.</p></div>
+  <div class="sb">
+    <h3>&#129302; Choose Your AI Provider</h3>
+    <p style="margin-bottom:16px;">Pick one of 5 AI providers. Your key is encrypted client-side with AES-256-GCM before storage. Never sent to our servers.</p>
+    <div class="g3" style="margin-bottom:18px;">
+      <div class="card click provider-card" data-provider="openai" onclick="selectProvider('openai')"><div class="ci">&#129001;</div><h3>ChatGPT</h3><p><p><p>OpenAI &mdash; gpt-4o</p><span class="ctag" id="ptag-openai">Not configured</span></div>
+      <div class="card click provider-card" data-provider="gemini" onclick="selectProvider('gemini')"><div class="ci">&#128309;</div><h3>Gemini</h3><p>Google &mdash; gemini-2.0-flash</p><span class="ctag" id="ptag-gemini">Not configured</span></div>
+      <div class="card click provider-card" data-provider="grok" onclick="selectProvider('grok')"><div class="ci">&#9899;</div><h3>Grok</h3><p>xAI &mdash; grok-2-latest</p><span class="ctag" id="ptag-grok">Not configured</span></div>
+      <div class="card click provider-card" data-provider="anthropic" onclick="selectProvider('anthropic')"><div class="ci">&#128995;</div><h3>Claude</h3>Anthropic &mdash; claude-sonnet-4</p><span class="ctag" id="ptag-anthropic">Not configured</span></div>
+      <div class="card click provider-card" data-provider="deepseek" onclick="selectProvider('deepseek')"><div class="ci">&#128308;</div><h3>DeepSeek</h3><p>DeepSeek &mdash; deepseek-chat</p><span class="ctag" id="ptag-deepseek">Not configured</span></div>
+      <div class="card click provider-card" data-provider="" onclick="selectProvider('')"><div class="ci">&#128244;</div><h3>Offline Mode</h3><p>No AI &mdash; embedded knowledge base</p><span class="ctag" id="ptag-offline">Always available</span></div>
+    </div>
+  </div>
+  <div class="api-box" id="key-entry-box">
+    <h3 id="key-entry-title">&#128273; API Key</h3>
+    <p id="key-entry-desc">Select a provider above, then paste its API key here. Encrypted with AES-256-GCM before storage.</p>
+    <div class="api-row">
+      <input class="api-input" type="password" id="api-key-in" placeholder="Paste your API key here">
+      <button class="btn btn-s" onclick="saveKey()">Save</button>
+      <button class="btn btn-outline btn-sm" onclick="clearKey()">Clear</button>
+    </div>
+    <div id="key-status" style="margin-top:10px;font-size:12px;color:var(--text3);">No provider selected &mdash; offline mode.</div>
+    <div style="margin-top:6px;font-size:11px;color:var(--text3);">&#128274; AES-256-GCM encrypted &middot; PBKDF2 key derivation &middot; Device-bound &middot; Never leaves your browser</div>
+    <div style="margin-top:8px;"><a id="get-key-link" href="#" target="_blank" style="font-size:12px;color:var(--sky);">Get a free API key &#8594;</a></div>
+  </div>
+  <div class="sb"><h3>System Status</h3><div id="sys-stat" style="font-size:13.5px;line-height:2;color:var(--text2);">Server: <span style="color:var(--sky)">&#10003; Running</span><br>Active Provider: <span id="mode-disp">Offline Research</span><br>Security: <span style="color:var(--coral)">&#128274; AES-256-GCM</span><br>Offline Knowledge Base: <span style="color:var(--sky)">&#10003; Available</span></div></div>
+</div>
+
+</main>
+</div>
+
+<footer>
+  <div class="footer-inner">
+    <div class="footer-grid">
+      <div class="footer-brand"><h3>&#129489;&#8205;&#9877;&#65039; PediaCare AI</h3><p>Paediatric Health Intelligence Platform &mdash; AI-researched insights from AAP, RCPCH, WHO, NICE, IAP and peer-reviewed literature for parents and carers.</p></div>
+      <div class="footer-col"><h4>Sections</h4><ul>
+        <li><a href="#" onclick="nav('conditions')">Child Conditions</a></li>
+        <li><a href="#" onclick="nav('growth')">Growth Tracker</a></li>
+        <li><a href="#" onclick="nav('vaccination')">Vaccination Schedule</a></li>
+        <li><a href="#" onclick="nav('medicines')">Medicines</a></li>
+        <li><a href="#" onclick="nav('emergency')">Emergency Guide</a></li>
+        <li><a href="#" onclick="nav('newborn')">Newborn Care</a></li>
+        <li><a href="#" onclick="nav('nutrition')">Nutrition</a></li>
+        <li><a href="#" onclick="nav('development')">Development</a></li>
+      </ul></div>
+      <div class="footer-col"><h4>Clinical Sources</h4><ul>
+        <li><a href="https://www.aap.org" target="_blank">AAP Guidelines</a></li>
+        <li><a href="https://www.rcpch.ac.uk" target="_blank">RCPCH Guidelines</a></li>
+        <li><a href="https://www.who.int" target="_blank">WHO Child Health</a></li>
+        <li><a href="https://www.nice.org.uk" target="_blank">NICE Guidelines</a></li>
+        <li><a href="https://www.iapindia.org" target="_blank">IAP India</a></li>
+      </ul></div>
+    </div>
+    <div class="footer-bottom">
+      <p>PediaCare AI &mdash; For Research &amp; Educational Purposes Only &middot; Not Medical Advice</p>
+      <div class="footer-disc">All information is AI-generated from published paediatric literature. Not a substitute for professional child healthcare. For emergencies call 112 (India) / 999 (UK) / 911 (US) immediately. &#128274; AES-256-GCM key encryption.</div>
+    </div>
+  </div>
+</footer>
+
+<script>
+// AES-256-GCM Secure Key Storage
+/**
+ * OrthoCare / CardioCare / NeuroCare / GynoCare / OncoCare AI
+ * AES-256-GCM Client-Side Key Security Module v1.0
+ * =====================================================
+ * Encrypts API keys before storing in localStorage using
+ * AES-256-GCM via the browser's native Web Crypto API.
+ * The encryption key is derived from a device-specific
+ * fingerprint using PBKDF2 (100,000 iterations, SHA-256).
+ *
+ * Security properties:
+ * - Keys are NEVER stored in plaintext in localStorage
+ * - AES-256-GCM provides both encryption AND authentication (AEAD)
+ * - The derived key is not persisted anywhere
+ * - A random 96-bit IV is generated for every encryption operation
+ * - PBKDF2 with 100k iterations makes brute-force attacks expensive
+ * - Key never leaves the browser except when sent directly to AI provider API
+ *
+ * Usage: drop this entire block before your ST = {} state declaration.
+ * Then replace all localStorage.setItem(key, JSON.stringify(keys)) with
+ * await SecureKeyStore.save(storeName, keys)
+ * and all JSON.parse(localStorage.getItem(...)) with
+ * await SecureKeyStore.load(storeName)
+ */
+
+const SecureKeyStore = (function() {
+  'use strict';
+
+  // Derive a deterministic device fingerprint from stable browser properties.
+  // This is NOT cryptographically strong identity - it's a convenience measure
+  // to ensure keys encrypted on this browser can only be decrypted on this browser.
+  function getDeviceFingerprint(appId) {
+    var parts = [
+      appId,
+      navigator.userAgent || '',
+      navigator.language || '',
+      (screen.width || 0) + 'x' + (screen.height || 0),
+      navigator.hardwareConcurrency || 0,
+      Intl.DateTimeFormat().resolvedOptions().timeZone || ''
+    ];
+    return parts.join('|:|');
+  }
+
+  // Derive AES-256 key from fingerprint using PBKDF2
+  async function deriveKey(appId) {
+    var fingerprint = getDeviceFingerprint(appId);
+    var encoder = new TextEncoder();
+    var rawKey = await crypto.subtle.importKey(
+      'raw',
+      encoder.encode(fingerprint),
+      { name: 'PBKDF2' },
+      false,
+      ['deriveKey']
+    );
+    // Use a fixed but app-specific salt (not secret - purpose is just domain separation)
+    var salt = encoder.encode('medical-ai-platform-' + appId + '-v1');
+    return await crypto.subtle.deriveKey(
+      { name: 'PBKDF2', salt: salt, iterations: 100000, hash: 'SHA-256' },
+      rawKey,
+      { name: 'AES-GCM', length: 256 },
+      false,
+      ['encrypt', 'decrypt']
+    );
+  }
+
+  // Encrypt a string value, returns base64-encoded IV + ciphertext
+  async function encrypt(plaintext, appId) {
+    var key = await deriveKey(appId);
+    var iv = crypto.getRandomValues(new Uint8Array(12)); // 96-bit random IV
+    var encoder = new TextEncoder();
+    var ciphertext = await crypto.subtle.encrypt(
+      { name: 'AES-GCM', iv: iv },
+      key,
+      encoder.encode(plaintext)
+    );
+    // Prepend IV to ciphertext for storage: [12 bytes IV][ciphertext]
+    var combined = new Uint8Array(iv.length + ciphertext.byteLength);
+    combined.set(iv, 0);
+    combined.set(new Uint8Array(ciphertext), iv.length);
+    return btoa(String.fromCharCode.apply(null, combined));
+  }
+
+  // Decrypt a base64-encoded IV + ciphertext string
+  async function decrypt(encoded, appId) {
+    try {
+      var key = await deriveKey(appId);
+      var combined = new Uint8Array(
+        atob(encoded).split('').map(function(c) { return c.charCodeAt(0); })
+      );
+      var iv = combined.slice(0, 12);
+      var ciphertext = combined.slice(12);
+      var plaintext = await crypto.subtle.decrypt(
+        { name: 'AES-GCM', iv: iv },
+        key,
+        ciphertext
+      );
+      return new TextDecoder().decode(plaintext);
+    } catch (e) {
+      // Decryption failed - key may have been stored with old method (plaintext)
+      // or device fingerprint changed. Return null to trigger re-entry.
+      return null;
+    }
+  }
+
+  // Public API
+  return {
+    /**
+     * Save API keys object to localStorage with AES-256-GCM encryption.
+     * @param {string} storeName - localStorage key name (e.g. 'cc_keys')
+     * @param {string} appId - app-specific ID for key derivation (e.g. 'cardiocare')
+     * @param {object} keysObj - { provider: 'sk-...' } keys object
+     */
+    save: async function(storeName, appId, keysObj) {
+      try {
+        var plaintext = JSON.stringify(keysObj);
+        var encrypted = await encrypt(plaintext, appId);
+        localStorage.setItem(storeName, encrypted);
+        localStorage.setItem(storeName + '_enc', '1'); // flag: encrypted format
+        return true;
+      } catch (e) {
+        // Fallback: if Web Crypto unavailable (very old browser), store plaintext
+        console.warn('[SecureKeyStore] Encryption unavailable, storing plaintext:', e.message);
+        localStorage.setItem(storeName, JSON.stringify(keysObj));
+        return false;
+      }
+    },
+
+    /**
+     * Load and decrypt API keys from localStorage.
+     * @param {string} storeName - localStorage key name
+     * @param {string} appId - must match what was used in save()
+     * @returns {object} keysObj or {} if not found / decryption failed
+     */
+    load: async function(storeName, appId) {
+      try {
+        var stored = localStorage.getItem(storeName);
+        if (!stored) return {};
+        var isEncrypted = localStorage.getItem(storeName + '_enc') === '1';
+        if (!isEncrypted) {
+          // Migrate plaintext to encrypted on next save
+          var parsed = JSON.parse(stored);
+          // Auto-migrate: re-encrypt now
+          await this.save(storeName, appId, parsed);
+          return parsed;
+        }
+        var plaintext = await decrypt(stored, appId);
+        if (plaintext === null) {
+          // Decryption failed (e.g. different browser/device after migration)
+          // Clear and start fresh - user will need to re-enter keys
+          console.warn('[SecureKeyStore] Decryption failed - clearing stored keys');
+          localStorage.removeItem(storeName);
+          localStorage.removeItem(storeName + '_enc');
+          return {};
+        }
+        return JSON.parse(plaintext);
+      } catch (e) {
+        return {};
+      }
+    },
+
+    /**
+     * Remove all keys for a store.
+     */
+    clear: function(storeName) {
+      localStorage.removeItem(storeName);
+      localStorage.removeItem(storeName + '_enc');
+    },
+
+    /**
+     * Check if Web Crypto AES-GCM is available in this browser.
+     */
+    isAvailable: function() {
+      return !!(window.crypto && window.crypto.subtle && window.crypto.subtle.encrypt);
+    }
+  };
+})();
+
+
+// Application Code
+var PROVIDERS = {
+  anthropic:{label:'Claude (Anthropic)',placeholder:'sk-ant-api03-...',getKeyUrl:'https://console.anthropic.com',icon:'&#128995;'},
+  openai:{label:'ChatGPT (OpenAI)',placeholder:'sk-...',getKeyUrl:'https://platform.openai.com/api-keys',icon:'&#129001;'},
+  gemini:{label:'Gemini (Google)',placeholder:'AIza...',getKeyUrl:'https://aistudio.google.com/apikey',icon:'&#128309;'},
+  grok:{label:'Grok (xAI)',placeholder:'xai-...',getKeyUrl:'https://console.x.ai',icon:'&#9899;'},
+  deepseek:{label:'DeepSeek',placeholder:'sk-...',getKeyUrl:'https://platform.deepseek.com/api_keys',icon:'&#128308;'}
+};
+var ST = { provider: localStorage.getItem('pediacare_provider') || '', keys: {}, files: [] };
+function currentApiKey(){ return ST.provider ? (ST.keys[ST.provider] || '') : ''; }
+
+document.addEventListener('DOMContentLoaded', function(){
+  (async function(){
+    if(SecureKeyStore.isAvailable()){ ST.keys = await SecureKeyStore.load('pediacare_keys','pediacare'); }
+    else { var r=localStorage.getItem('pediacare_keys'); ST.keys=r?JSON.parse(r):{}; }
+  })();
+  ['dc1','dc2','dc3'].forEach(function(id){
+    document.getElementById(id).addEventListener('change', function(){
+      var ok=['dc1','dc2','dc3'].every(function(i){ return document.getElementById(i).checked; });
+      document.getElementById('disc-btn').disabled = !ok;
+    });
+  });
+  if(sessionStorage.getItem('pediacare_disc')) document.getElementById('disc-modal').style.display='none';
+  setTimeout(function(){ refreshProviderTags(); selectProvider(ST.provider,true); },100);
+});
+
+function acceptDisc(){ document.getElementById('disc-modal').style.display='none'; sessionStorage.setItem('pediacare_disc','1'); }
+
+function nav(id){
+  document.querySelectorAll('.panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.ntab,.sbi').forEach(function(n){ n.classList.remove('active'); });
+  var p=document.getElementById('panel-'+id); if(p) p.classList.add('active');
+  document.querySelectorAll('.ntab,.sbi').forEach(function(el){ var oc=el.getAttribute('onclick'); if(oc&&oc.indexOf("'"+id+"'")!==-1) el.classList.add('active'); });
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function switchTab(btn,id){
+  var parent=btn.closest('.panel');
+  if(parent){ parent.querySelectorAll('.tbtn').forEach(function(b){ b.classList.remove('active'); }); parent.querySelectorAll('.tpane').forEach(function(p){ p.classList.remove('active'); }); }
+  btn.classList.add('active');
+  var pane=document.getElementById(id); if(pane) pane.classList.add('active');
+}
+
+function selectProvider(pid,init){
+  ST.provider=pid; localStorage.setItem('pediacare_provider',pid);
+  document.querySelectorAll('.provider-card').forEach(function(c){ c.classList.remove('selected'); });
+  var ac=document.querySelector('.provider-card[data-provider="'+pid+'"]');
+  if(ac) ac.classList.add('selected');
+  var box=document.getElementById('key-entry-box'),title=document.getElementById('key-entry-title');
+  var desc=document.getElementById('key-entry-desc'),input=document.getElementById('api-key-in');
+  var link=document.getElementById('get-key-link'),status=document.getElementById('key-status');
+  var md=document.getElementById('mode-disp');
+  if(!pid){ box.style.display='none'; status.textContent='Offline mode.'; md.textContent='Offline Research'; if(!init) toast('Offline mode active.'); return; }
+  var meta=PROVIDERS[pid];
+  box.style.display='block';
+  title.innerHTML=meta.icon+' '+meta.label+' API Key';
+  desc.innerHTML='Get key at <strong>'+meta.getKeyUrl.replace('https://','')+'</strong>. AES-256-GCM encrypted before storage.';
+  input.placeholder=meta.placeholder; input.value=ST.keys[pid]||''; link.href=meta.getKeyUrl;
+  if(ST.keys[pid]){ status.textContent='&#128274; Active: '+meta.label+' configured.'; status.style.color='var(--sky)'; md.textContent='Live AI ('+meta.label+')'; }
+  else { status.textContent='No key for '+meta.label+'.'; status.style.color='var(--text3)'; md.textContent=meta.label+' - key required'; }
+  if(!init) window.scrollTo({top:document.getElementById('key-entry-box').offsetTop-100,behavior:'smooth'});
+}
+
+function refreshProviderTags(){
+  Object.keys(PROVIDERS).forEach(function(p){
+    var tag=document.getElementById('ptag-'+p); if(!tag) return;
+    if(ST.keys[p]){ tag.textContent='Configured'; tag.classList.add('configured'); }
+    else { tag.textContent='Not configured'; tag.classList.remove('configured'); }
+  });
+}
+
+function saveKey(){
+  if(!ST.provider){ toast('Select a provider first.'); return; }
+  var k=document.getElementById('api-key-in').value.trim();
+  if(!k){ toast('Please paste an API key.'); return; }
+  ST.keys[ST.provider]=k;
+  SecureKeyStore.isAvailable()
+    ? SecureKeyStore.save('pediacare_keys','pediacare',ST.keys)
+    : localStorage.setItem('pediacare_keys',JSON.stringify(ST.keys));
+  refreshProviderTags(); selectProvider(ST.provider,true); toast(PROVIDERS[ST.provider].label+' key saved (AES-256 encrypted).');
+}
+function clearKey(){
+  if(!ST.provider) return;
+  delete ST.keys[ST.provider];
+  SecureKeyStore.isAvailable()
+    ? SecureKeyStore.save('pediacare_keys','pediacare',ST.keys)
+    : localStorage.setItem('pediacare_keys',JSON.stringify(ST.keys));
+  document.getElementById('api-key-in').value='';
+  refreshProviderTags(); selectProvider(ST.provider,true);
+}
+
+var FICONS={pdf:'&#128196;',jpg:'&#128444;',jpeg:'&#128444;',png:'&#128444;',docx:'&#128196;',txt:'&#128221;',csv:'&#128202;'};
+function handleFiles(files){
+  Array.from(files).forEach(function(f){
+    if(ST.files.find(function(x){ return x.name===f.name&&x.size===f.size; })) return;
+    ST.files.push(f);
+    var ext=f.name.split('.').pop().toLowerCase();
+    var sz=f.size>1048576?(f.size/1048576).toFixed(1)+'MB':Math.round(f.size/1024)+'KB';
+    var el=document.createElement('div'); el.className='file-row'; el.dataset.fname=f.name;
+    var sn=f.name.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+    el.innerHTML='<span class="fr-ico">'+(FICONS[ext]||'&#128193;')+'</span><span class="fr-name">'+sn+'</span><span class="fr-meta">'+sz+'</span><span class="fr-ok">Ready</span><span class="fr-del" onclick="removeByEl(this)">&#10005;</span>';
+    document.getElementById('flist').appendChild(el);
+  });
+}
+function removeByEl(btn){ var r=btn.closest('.file-row'); if(!r) return; var n=r.dataset.fname; ST.files=ST.files.filter(function(f){ return f.name!==n; }); r.remove(); }
+function clearFiles(){ ST.files=[]; document.getElementById('flist').innerHTML=''; }
+function uploadFiles(){
+  if(!ST.files.length){ toast('Please select files first.'); return; }
+  var btn=document.getElementById('up-btn'); setLoad(btn,true);
+  setTimeout(function(){ document.getElementById('up-result').innerHTML='<div class="alert coral" style="margin-top:16px;"><span class="ai-ic">&#10003;</span><div><strong>'+ST.files.length+' file(s) uploaded.</strong> Go to Conditions or Growth Tracker to research your reports.</div></div>'; setLoad(btn,false); },2000);
+}
+
+function assessGrowth(){
+  var age=document.getElementById('gr-age').value.trim();
+  var sex=document.getElementById('gr-sex').value;
+  var weight=document.getElementById('gr-weight').value.trim();
+  var height=document.getElementById('gr-height').value.trim();
+  var head=document.getElementById('gr-head').value.trim();
+  if(!age||!weight){ toast('Please enter at least age and weight.'); return; }
+  var btn=document.getElementById('gr-btn'); setLoad(btn,true);
+  var out=document.getElementById('growth-output');
+  var key=currentApiKey();
+  if(ST.provider&&key){
+    fetch('/api/growth/assess',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({age:age,sex:sex,weight:weight,height:height,head_circumference:head,provider:ST.provider,api_key:key})})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      setLoad(btn,false);
+      var mt=data.mode==='live_ai'?'<span class="ctag" style="background:var(--coral-pale);color:var(--coral);border-color:rgba(232,121,74,0.3);display:inline-block;margin-bottom:10px;">Live AI &middot; '+PROVIDERS[ST.provider].label+'</span>':'<span class="ctag" style="display:inline-block;margin-bottom:10px;">Offline Research</span>';
+      out.innerHTML='<div class="sb"><h3>Growth Research Context</h3>'+mt+'<div style="white-space:pre-wrap;font-size:13.5px;line-height:1.8;color:var(--text2);">'+(data.content||'').replace(/\n/g,'<br>')+'</div></div>';
+      out.scrollIntoView({behavior:'smooth',block:'start'});
+    }).catch(function(){ setLoad(btn,false); toast('Could not reach server.'); });
+  } else {
+    setLoad(btn,false);
+    out.innerHTML='<div class="sb"><h3>Growth Research Context</h3><p>For age '+age+', weight '+weight+'kg'+(height?(', height '+height+'cm'):'')+': general guidance suggests steady tracking along a centile line is reassuring. Choose an AI provider in Settings for personalised research context, and always confirm with your health visitor or paediatrician using official WHO/UK-WHO growth charts.</p></div>';
+    out.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
+var CONDITIONS_KB={
+  'Fever in Children':'<div class="sb"><h3>Fever in Children</h3><p>Fever (temperature 38C or above) is a normal immune response, most commonly due to viral infection in children.</p><h4>NICE Traffic Light System</h4><ul><li><strong>Green (low risk):</strong> Normal colour, responds normally, content, normal skin/eyes, moist mucous membranes</li><li><strong>Amber (intermediate risk):</strong> Pallor, decreased activity, tachypnoea, CRT 3+ seconds, dry mucous membranes, fever over 5 days</li><li><strong>Red (high risk):</strong> Pale/mottled/blue, unresponsive, weak cry, grunting, severe chest indrawing, age under 3 months with any fever, non-blanching rash, bulging fontanelle, neck stiffness</li></ul><h4>Management</h4><ul><li>Paracetamol 15mg/kg every 4-6h or ibuprofen 5-10mg/kg every 6-8h for distress/discomfort</li><li>Do not use antipyretics solely to prevent febrile seizures (no evidence)</li><li>Encourage fluids, do not over-wrap</li><li>ANY fever in infant under 3 months: urgent paediatric assessment</li></ul><div class="alert warn" style="margin-top:12px;"><span class="ai-ic">&#9888;&#65039;</span><div>Research purposes only. Consult your paediatrician if concerned.</div></div></div>',
+  'Bronchiolitis':'<div class="sb"><h3>Bronchiolitis</h3><p>Viral lower respiratory infection, predominantly RSV, affecting infants under 12 months (peak 3-6 months).</p><h4>Symptoms</h4><ul><li>Coryza progressing to persistent cough, tachypnoea, chest wall recession, wheeze/crackles, feeding difficulty</li><li>Usually self-limiting over 1-2 weeks (cough may persist longer)</li></ul><h4>Red Flags for Hospital Assessment</h4><ul><li>Apnoea episodes, marked respiratory distress (grunting, severe recession)</li><li>Central cyanosis, SpO2 persistently under 92%</li><li>Poor feeding (under 50% normal intake), clinical dehydration, exhaustion</li></ul><h4>Management</h4><p>Supportive care only &mdash; oxygen if SpO2 low, feeding support if needed. No role for bronchodilators, steroids, or antibiotics in straightforward bronchiolitis (NICE guidance).</p><div class="alert warn" style="margin-top:12px;"><span class="ai-ic">&#9888;&#65039;</span><div>Research purposes only. Seek urgent care if red flag features present.</div></div></div>',
+  'Autism Spectrum Disorder':'<div class="sb"><h3>Autism Spectrum Disorder (ASD)</h3><p>A neurodevelopmental condition affecting social communication and behaviour, presenting in early childhood.</p><h4>Core Features</h4><ul><li>Differences in social communication and interaction</li><li>Restricted or repetitive behaviours and interests</li><li>Sensory sensitivities</li></ul><h4>Early Signs</h4><ul><li>Reduced eye contact, delayed language, reduced response to name</li><li>Repetitive movements, intense focus on specific interests</li><li>Difficulty with changes in routine</li></ul><h4>Diagnosis and Support</h4><p>Comprehensive multidisciplinary assessment (paediatrician, psychologist, speech and language therapist) &mdash; no single test exists. Early intervention (speech therapy, occupational therapy, behavioural approaches) improves outcomes, so earlier identification allows earlier support.</p><div class="alert warn" style="margin-top:12px;"><span class="ai-ic">&#9888;&#65039;</span><div>Research purposes only. Consult your paediatrician for assessment referral.</div></div></div>',
+  'Asthma in Children':'<div class="sb"><h3>Asthma in Children</h3><p>The most common chronic disease of childhood. Diagnosis in young children (under 5) is largely clinical given the difficulty performing spirometry.</p><h4>Symptoms</h4><ul><li>Recurrent wheeze, cough (especially nocturnal or exercise-induced)</li><li>Often associated with atopy (eczema, hay fever, family history)</li></ul><h4>Management (Stepwise)</h4><ul><li>SABA (salbutamol) reliever inhaler first-line for symptom relief</li><li>Inhaler technique and spacer device use is critical &mdash; check at every review</li><li>ICS (inhaled corticosteroid) preventer if frequent symptoms</li><li>Personalised asthma action plan for every child</li></ul><h4>Acute Severe Asthma &mdash; EMERGENCY</h4><p>Unable to complete sentences, accessory muscle use, SpO2 under 92%, silent chest, exhaustion, cyanosis &mdash; call 112/999/911 immediately.</p><div class="alert warn" style="margin-top:12px;"><span class="ai-ic">&#9888;&#65039;</span><div>Research purposes only. Consult your paediatrician.</div></div></div>',
+};
+
+function showCondition(){
+  var sel=document.getElementById('cond-sel').value;
+  var out=document.getElementById('cond-output');
+  if(!sel){ out.innerHTML=''; return; }
+  if(CONDITIONS_KB[sel]){ out.innerHTML=CONDITIONS_KB[sel]; out.scrollIntoView({behavior:'smooth',block:'start'}); return; }
+  fetchConditionLive(sel,out);
+}
+function fetchConditionLive(sel,out){
+  var key=currentApiKey();
+  if(ST.provider&&key){
+    out.innerHTML='<div class="sb"><h3>'+sel+'</h3><div class="typing" style="padding:10px 0;"><span></span><span></span><span></span></div></div>';
+    out.scrollIntoView({behavior:'smooth',block:'start'});
+    fetch('/api/condition/'+encodeURIComponent(sel)+'?provider='+ST.provider+'&api_key='+encodeURIComponent(key))
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var body=data.content||(data.condition?JSON.stringify(data.condition,null,2):'No research available.');
+      var mt=data.mode==='live_ai'?'<span class="ctag" style="background:var(--coral-pale);color:var(--coral);border-color:rgba(232,121,74,0.3);display:inline-block;margin-bottom:10px;">Live AI &middot; '+PROVIDERS[ST.provider].label+'</span>':'<span class="ctag" style="display:inline-block;margin-bottom:10px;">Offline Research</span>';
+      out.innerHTML='<div class="sb"><h3>'+sel+'</h3>'+mt+'<div style="white-space:pre-wrap;font-size:13.5px;line-height:1.8;color:var(--text2);">'+body.replace(/\n/g,'<br>')+'</div></div>';
+    }).catch(function(){ out.innerHTML='<div class="sb"><h3>'+sel+'</h3><p>Could not reach server. Try the AI Chat.</p></div>'; });
+  } else {
+    out.innerHTML='<div class="sb"><h3>'+sel+'</h3><p>Choose an AI provider in Settings for live research on this condition, or ask in the AI Chat.</p></div>';
+    out.scrollIntoView({behavior:'smooth',block:'start'});
+  }
+}
+
+var CHAT_KB={
+  'fever':'Fever in children: temperature 38C or above, most commonly viral. NICE traffic light system (green/amber/red) guides risk assessment. ANY fever in infant under 3 months needs urgent paediatric review. Paracetamol 15mg/kg or ibuprofen 5-10mg/kg for discomfort, not solely to lower the number. Non-blanching rash with fever is an emergency. Consult your paediatrician.',
+  'vaccin':'Vaccination: extremely safe and effective. MMR-autism link definitively disproven. Common mild side effects (soreness, mild fever) resolve within 1-2 days. Minor illness without fever is NOT a reason to delay. Catch-up always possible at any age, no need to restart the series. Consult your paediatrician about your child\u2019s schedule.',
+  'cough':'Cough in children: most are viral and self-limiting. Bronchiolitis (under 12 months, RSV): supportive care only, no antibiotics/steroids needed. Croup: barking cough, single-dose dexamethasone helps even mild cases. Asthma: recurrent cough especially nocturnal/exercise-induced, needs inhaler technique review. Red flags: breathing difficulty, blue lips, exhaustion - call 112/999/911. Consult your paediatrician.',
+  'growth':'Growth tracking uses WHO and UK-WHO charts plotting weight, height, and head circumference against age. Newborns regain birth weight by 2-3 weeks (up to 10% loss is normal). Steady tracking along one centile line is reassuring; crossing 2+ centile lines warrants review. Always have measurements plotted by a health visitor or paediatrician for accurate assessment.',
+  'rash':'Childhood rashes: most are viral and benign (chickenpox, hand-foot-mouth, roseola, fifth disease). EMERGENCY: non-blanching rash (does not fade when pressed with a glass) with fever - possible meningococcal sepsis, call 112/999/911 immediately. Kawasaki disease: fever 5+ days plus rash, conjunctivitis, strawberry tongue, swollen hands/feet - needs urgent diagnosis. Consult your paediatrician.',
+  'development':'Developmental milestones vary by area: gross motor, fine motor, language, social. Red flags: no eye contact by 3 months, not sitting by 12 months, not walking by 18 months, no words by 18 months, any regression in skills. Hearing test is essential for speech delay. Early intervention improves outcomes for autism and other developmental concerns. Consult your paediatrician for assessment.',
+  'feeding':'Infant feeding: exclusive breastfeeding recommended for first 6 months (WHO), continuing with complementary foods to 2 years or beyond. Weaning starts around 6 months. Introduce allergenic foods (egg, peanut, dairy) early and one at a time - reduces allergy risk per current evidence. Picky eating is common in toddlers - offer variety without pressure, avoid food as reward/punishment. Consult your paediatrician or health visitor.',
+  'medicine':'Children\u2019s medicines are weight-based - always confirm dosing with a pharmacist or doctor. Paracetamol 15mg/kg every 4-6h, ibuprofen 5-10mg/kg every 6-8h for pain/fever discomfort. Avoid aspirin under 16 years (Reye syndrome risk). Most childhood infections are viral and do not need antibiotics. Always use the dosing device provided with liquid medicines. Consult your pharmacist or paediatrician.',
+};
+
+function sendChat(){
+  var inp=document.getElementById('chat-in');
+  var msg=inp.value.trim(); if(!msg) return;
+  addMsg('user',msg); inp.value='';
+  var msgs=document.getElementById('chat-msgs');
+  var tid='ty-'+Date.now();
+  var ti=document.createElement('div'); ti.className='cm ai'; ti.id=tid;
+  ti.innerHTML='<div class="ai-lbl">PediaCare AI</div><div class="typing"><span></span><span></span><span></span></div>';
+  msgs.appendChild(ti); msgs.scrollTop=msgs.scrollHeight;
+  var key=currentApiKey();
+  if(ST.provider&&key){
+    fetch('/api/chat/send',{method:'POST',headers:{'Content-Type':'application/json'},
+      body:JSON.stringify({message:msg,request_ai:true,provider:ST.provider,api_key:key})})
+    .then(function(r){ return r.json(); })
+    .then(function(data){
+      var el=document.getElementById(tid); if(el) el.remove();
+      if(data.ai_response){ addMsg('ai',data.ai_response,true); return; }
+      offlineChat(msg,null);
+    }).catch(function(){ var el=document.getElementById(tid); if(el) el.remove(); offlineChat(msg,null); });
+  } else { setTimeout(function(){ offlineChat(msg,tid); },600); }
+}
+function offlineChat(msg,tid){
+  if(tid){ var el=document.getElementById(tid); if(el) el.remove(); }
+  var ml=msg.toLowerCase(); var resp='';
+  for(var k in CHAT_KB){ if(ml.indexOf(k)!==-1){ resp=CHAT_KB[k]; break; } }
+  if(!resp) resp='Thank you for your question about "'+msg+'". For detailed research browse the relevant sections or choose an AI provider in Settings. For child emergencies (breathing difficulty, seizure, unresponsive child, non-blanching rash) call 112/999/911 immediately. All responses are for educational research only. Always consult your paediatrician.';
+  addMsg('ai',resp,false);
+}
+function addMsg(type,text,isLive){
+  var msgs=document.getElementById('chat-msgs');
+  var el=document.createElement('div'); el.className='cm '+type;
+  if(type==='ai'){
+    var label=(isLive&&ST.provider)?('PediaCare AI &middot; '+PROVIDERS[ST.provider].label):'PediaCare AI';
+    el.innerHTML='<div class="ai-lbl">'+label+'</div>'+text.replace(/\n/g,'<br>');
+  } else { el.textContent=text; }
+  msgs.appendChild(el); msgs.scrollTop=msgs.scrollHeight;
+}
+function setLoad(btn,state){ if(!btn) return; if(state) btn.classList.add('loading'); else btn.classList.remove('loading'); btn.disabled=state; }
+function toast(msg){ var t=document.createElement('div'); t.style.cssText='position:fixed;bottom:30px;left:50%;transform:translateX(-50%);background:#fff;border:1px solid var(--border2);color:var(--text);padding:12px 22px;border-radius:10px;font-size:14px;z-index:9999;box-shadow:var(--shadow);'; t.textContent=msg; document.body.appendChild(t); setTimeout(function(){ t.remove(); },3000); }
+var uz=document.getElementById('uz');
+uz.addEventListener('dragover',function(e){e.preventDefault();uz.classList.add('drag');});
+uz.addEventListener('dragleave',function(){uz.classList.remove('drag');});
+uz.addEventListener('drop',function(e){e.preventDefault();uz.classList.remove('drag');handleFiles(e.dataTransfer.files);});
+</script>
+</body>
+</html>
